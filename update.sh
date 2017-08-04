@@ -24,9 +24,9 @@ function_update()
     git remote update
     git push origin google/$google_revision:$our_branch -f
     echo
-    echo -e "${green}----------------------------------------------------------------------"
+    echo -e "${bold}${green}======================================================================"
     echo -e "Repo: ${PWD##*/} sync complete${nc}"
-    echo -e "${green}----------------------------------------------------------------------"
+    echo -e "${green}======================================================================"
     echo
     cd ../
 }
@@ -34,25 +34,25 @@ function_update()
 function_clone()
 {
     if [ ! -d "$repo_name" ]; then
-        echo -e "${red}----------------------------------------------------------------------"
+        echo -e "${red}======================================================================"
         echo -e "${red}Let's start downloading and syncing "$repo_name" repo"
-        echo -e "${red}----------------------------------------------------------------------${blue}"
+        echo -e "${red}======================================================================${blue}"
         echo
         git clone git@github.com:SonyM4/$repo_name.git
         function_update
     else
-        echo -e "${red}----------------------------------------------------------------------"
+        echo -e "${red}======================================================================"
         echo -e "${red}Let's start syncing "$repo_name" repo"
-        echo -e "${red}----------------------------------------------------------------------${blue}"
+        echo -e "${red}======================================================================${blue}"
         echo
         function_update
     fi
 }
 
 clear
-echo -e "${bold}${white}============================================================"
-echo -e "  ${bold}${white}Please select what the repositories you want to update:"
-echo -e "============================================================"
+echo -e "${red}======================================================================"
+echo -e "       ${red}Please select what the repositories you want to update:"
+echo -e "======================================================================${blue}"
 echo
 echo -e "> MAIN MENU"
 echo
@@ -70,8 +70,9 @@ case $opt in
     1)
         google_revision="master"
         our_branch="android-8.0-preview"
-        echo -e "${bold}${green}Android O Developer Preview 3 was selected${white}"
-        echo
+        echo -e "${green}======================================================================"
+        echo -e "             Android O Developer Preview 3 was selected"
+        echo -e "======================================================================"
         sleep 3
         for repo_name in "${repos_array[@]}"; do
             function_clone
@@ -80,8 +81,9 @@ case $opt in
     2)
         google_revision="android-7.1.2_r27"
         our_branch="android-7.1"
-        echo -e "${bold}${green}Android 7.1.2_r27 was selected${white}"
-        echo
+        echo -e "${green}======================================================================"
+        echo -e "                   Android 7.1.2_r27 was selected"
+        echo -e "======================================================================"
         sleep 3
         for repo_name in "${repos_array[@]}"; do
             function_clone
@@ -89,9 +91,10 @@ case $opt in
         ;;
 esac
 
-echo -e "${bold}${white}\n----------------------------------------------------------------------"
-echo -e "All jobs are done!"
-echo -e "----------------------------------------------------------------------"
+echo
+echo -e "${white}======================================================================"
+echo -e "                          All jobs are done!"
+echo -e "======================================================================"
 read -p "Go to the main menu? [Y/n]: " -n 1 -r
 echo
 
