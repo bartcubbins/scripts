@@ -22,7 +22,8 @@ function_update()
     git reset --hard
     git remote add google https://android.googlesource.com/${repo_name//_//}
     git remote update
-    git push origin google/$google_revision:$our_branch -f
+    git checkout tags/$google_revision
+    git push origin HEAD:$our_branch -f
     echo
     echo -e "${bold}${green}======================================================================"
     echo -e "Repo: ${PWD##*/} sync complete${nc}"
