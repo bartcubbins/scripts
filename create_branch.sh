@@ -32,6 +32,7 @@ for repo_name in "${repos_array[@]}"; do
     cd $repo_name
     git reset --hard
     git checkout -b $branch_name
+    git push origin $branch_name
     echo
     echo -e "${green}======================================================================"
     echo -e "Branch: "$branch_name" was created in "$repo_name" repository${nc}"
