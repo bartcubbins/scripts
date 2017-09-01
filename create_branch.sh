@@ -42,7 +42,8 @@ echo
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     clear
-    bash ./scripts/menu # small hack:)
+    cd ./scripts
+    bash ./menu # small hack:)
 else
     exit 1
 fi

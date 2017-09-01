@@ -53,6 +53,8 @@ echo
 echo -e "[1] Android 8.0.0_r4"
 echo -e "[2] Android 7.1.2_r27"
 echo
+echo -e "[0] Back to menu"
+echo
 echo -e -n "Enter option: "
 read -n1 opt
 echo
@@ -83,6 +85,10 @@ case $opt in
             function_clone
         done
         ;;
+    0)
+        cd ./scripts
+        bash ./menu
+        ;;
 esac
 
 echo
@@ -94,7 +100,8 @@ echo
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     clear
-    bash ./scripts/menu # small hack:)
+    cd ./scripts
+    bash ./menu # small hack:)
 else
     exit 1
 fi
