@@ -16,7 +16,8 @@ echo -e "> MAIN MENU"
 echo
 echo -e "  [1] - Update sources for ROM (force update!)"
 echo -e "  [2] - Update device sources from Sony repo"
-echo -e "  [3] - Branch creator"
+echo -e "  [3] - Create branches in our repos"
+echo -e "  [4] - Remove branches from our repos"
 echo -e "  [0] - Exit"
 echo 
 echo -e -n "Enter option: "
@@ -35,6 +36,16 @@ case $opt in
         ;;
     3)
         bash ./create_branch.sh
+        ;;
+    4)
+        echo
+        read -p "Be careful! Are you sure? [Y/n]: " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+        bash ./remove_branch.sh
+        else
+            bash ./menu
+        fi
         ;;
     0)
         echo
