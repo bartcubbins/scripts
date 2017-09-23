@@ -50,7 +50,7 @@ echo -e "======================================================================$
 echo
 echo -e "> MAIN MENU"
 echo
-echo -e "[1] Android 8.0.0_r4"
+echo -e "[1] Android 8.0.0_r12"
 echo -e "[2] Android 7.1.2_r27"
 echo
 echo -e "[0] Back to menu"
@@ -64,10 +64,10 @@ cd ../ # we want to pull sources near scripts folder
 
 case $opt in
     1)
-        google_revision="android-8.0.0_r4"
+        google_revision="android-8.0.0_r12"
         our_branch="android-8.0"
         echo -e "${green}======================================================================"
-        echo -e "             Android 8.0.0_r4 was selected"
+        echo -e "             Android 8.0.0_r12 was selected"
         echo -e "======================================================================"
         sleep 3
         for repo_name in "${repos_array[@]}"; do
