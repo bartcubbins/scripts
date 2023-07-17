@@ -57,7 +57,6 @@ continue() {
 #----------------------------------------------------------------------
 ROOT=$(dirname $(realpath "$0"))
 ANDROID_ROOT=$ROOT/../android-13
-ANDROID_ROOT_12=$ROOT/../android-12
 KERNEL_SRC=$ROOT/../kernel
 KERNEL_OUT=$ROOT/../kernel_out
 KERNEL_DEFCONFIG=aosp_${PLATFORM_NAME}_${DEVICE_NAME}_defconfig
@@ -66,13 +65,16 @@ MKBOOTIMG_PATH=$ANDROID_ROOT/system/tools/mkbootimg/mkbootimg.py
 MKDTIMG_PATH=$ANDROID_ROOT/system/libufdt/utils/src/mkdtboimg.py
 AVBTOOL_PATH=$ANDROID_ROOT/external/avb/avbtool.py
 UFDT_APPLY_OVERLAY=$ANDROID_ROOT/prebuilts/misc/linux-x86/libufdt/ufdt_apply_overlay
-CLANG_PATH=$ANDROID_ROOT_12/prebuilts/clang/host/linux-x86/clang-r416183b1/bin
-#CLANG_PATH=$ANDROID_ROOT/prebuilts/clang/host/linux-x86/clang-r450784d/bin
-GCC_PATH=$ANDROID_ROOT_12/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin
+CLANG_PATH=$ANDROID_ROOT/prebuilts/clang/host/linux-x86/clang-r450784d/bin
+#ANDROID_ROOT_12=$ROOT/../android-12
+#CLANG_PATH=$ANDROID_ROOT_12/prebuilts/clang/host/linux-x86/clang-r416183b1/bin
+#GCC_PATH=$ANDROID_ROOT_12/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin
 
-KERNEL_MAKE_EXEC="make O=$KERNEL_OUT ARCH=arm64 DTC_OVERLAY_TEST_EXT=${UFDT_APPLY_OVERLAY} CC=${CLANG_PATH}/clang CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=${GCC_PATH}/aarch64-linux-androidkernel- -j${JOBS_NUMBER} $(stdout_mode)"
+PATH=${PATH}:${CLANG_PATH}
 
 [ ! $JOBS_NUMBER ] && JOBS_NUMBER=$(nproc)
+
+KERNEL_MAKE_ARGS="O=$KERNEL_OUT ARCH=arm64 DTC_OVERLAY_TEST_EXT=${UFDT_APPLY_OVERLAY} LLVM=1 LLVM_IAS=1 CROSS_COMPILE=aarch64-linux- -j${JOBS_NUMBER} $(stdout_mode)"
 
 [ $CLEAR_OUT ] && print "Clearing the kernel out folder..." && rm -fr $KERNEL_OUT
 
@@ -89,11 +91,11 @@ print "#    Kernel out:     ${KERNEL_OUT}"
 print "#    Platform name:  ${PLATFORM_NAME}"
 print "#    Device name:    ${DEVICE_NAME}"
 print "#"
-print "#    Clear output folder:            $([ ! -z "$CLEAR_OUT" ]         && echo "true" || echo "false")"
-print "#    Skip kernel build:              $([ ! -z "$SKIP_KERNEL_BUILD" ] && echo "true" || echo "false")"
-print "#    Build boot/dtbo images:         $([ ! -z "$BUILD_IMG" ]         && echo "true" || echo "false")"
-print "#    Launch menuconfig before build: $([ ! -z "$MENUCONFIG" ]        && echo "true" || echo "false")"
-print "#    Build quiet:                    $([ ! -z "$QUIET" ]             && echo "true" || echo "false")"
+print "#    Clear output folder:            $([ ! -z "$CLEAR_OUT" ]         && echo "$CLEAR_OUT"                    || echo "false")"
+print "#    Skip kernel build:              $([ ! -z "$SKIP_KERNEL_BUILD" ] && echo "$SKIP_KERNEL_BUILD"            || echo "false")"
+print "#    Build boot/dtbo images:         $([ ! -z "$BUILD_IMG" ]         && echo "$BUILD_IMG"                    || echo "false")"
+print "#    Launch menuconfig before build: $([ ! -z "$MENUCONFIG" ]        && echo "$MENUCONFIG"                   || echo "false")"
+print "#    Build quiet:                    $([ ! -z "$QUIET" ]             && echo "$QUIET"                        || echo "false")"
 print "#    Save buildlog to the file:      $([ ! -z "$LOG" ]               && echo "${KERNEL_OUT}/build_log.log"   || echo "false")"
 print "#    Threads:                        ${JOBS_NUMBER}"
 print "#"
@@ -108,13 +110,13 @@ if [ ! $SKIP_KERNEL_BUILD ]; then
     print "Entering kernel source directory: $KERNEL_SRC"
     cd $KERNEL_SRC
 
-    [ ! -f $KERNEL_OUT/.config ] && ( ! $KERNEL_MAKE_EXEC $KERNEL_DEFCONFIG ) && exit
+    [ ! -f $KERNEL_OUT/.config ] && ( ! make $KERNEL_MAKE_ARGS $KERNEL_DEFCONFIG ) && exit
 
-    [ $MENUCONFIG ] && $KERNEL_MAKE_EXEC menuconfig && continue
+    [ $MENUCONFIG ] && make $KERNEL_MAKE_ARGS menuconfig && continue
 
-    find $KERNEL_OUT/arch/arm64/boot/dts/{qcom,somc}/ \( -name *.dtb -o -name *.dtbo \) -delete -printf "$(print "Remove old DTB: %p")"
+    find $KERNEL_OUT/arch/arm64/boot/dts/{qcom,somc}/ \( -name *.dtb -o -name *.dtbo \) -delete -printf "$(print "Remove old DTB: %p")" 2>/dev/null
 
-    ( ! $KERNEL_MAKE_EXEC ) && exit
+    ( ! make $KERNEL_MAKE_ARGS ) && exit
 fi
 
 #----------------------------------------------------------------------
@@ -145,7 +147,7 @@ if [ $BUILD_IMG ] && [ -f "${ROOT}/${PLATFORM_NAME}_${DEVICE_NAME}.config" ]; th
         --base ${KERNEL_BASE} \
         --pagesize ${KERNEL_PAGESIZE} \
         --os_version 13 \
-        --os_patch_level 2022-09-05 \
+        --os_patch_level 2023-05-05 \
         --ramdisk_offset ${RAMDISK_OFFSET} \
         --tags_offset ${KERNEL_TAGS_OFFSET} \
         --output $ANDROID_ROOT/out/target/product/$DEVICE_NAME/boot.img
@@ -172,3 +174,4 @@ fi
 
 print ""
 print "# All job done! Time elapsed: $(date -ud "0 $(date +%s) seconds - $start_time seconds" +"%H hr %M min %S sec")"
+print ""
